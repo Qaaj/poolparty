@@ -5,7 +5,8 @@ const fetch = require('node-fetch');
 const numbro = require('numbro');
 const {Table} = require('console-table-printer');
 
-const wallets = ['0x7d0f8aeB2fC339D8F7Db6f066484266eE192E837']
+// Example wallet
+const wallets = ['0xe2a8f5e3efe04493b76501a206a0f72cebda3819']
 let num = 0, STATE = {positions: {}};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,7 +30,6 @@ const getName = (name) => {
 const round = (num, amt =1) => numbro(num).format({ mantissa: amt, thousandSeparated: true })
 
 const updateUI = async () => {
-    console.log(STATE.positions);
     if (STATE.positions) {
         clear();
         const load = loader();
@@ -101,7 +101,14 @@ const priceFetcher = async () => {
 }
 
 const poolsFetcher = async () => {
-    wallets.map(async (wallet, i) => {
+    let walletlist = wallets;
+    try {
+        const mywallets = require('./wallets.js');
+        walletlist = mywallets;
+    }catch(err){
+        console.log('File not found - using fallback')
+    }
+    walletlist.map(async (wallet, i) => {
         await sleep(i * 4000);
         const data = await fetch(`https://api.apy.vision/portfolio/${wallet}`);
         const json = await data.json();
